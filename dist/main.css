@@ -1,8 +1,12 @@
+body {
+    font-family: 'Mr Dafoe', cursive;
+    font-weight: 100;
+}
+
 .calculator {
     background-color: #505050;
     display: inline-block;
     font-size: 18px;
-    font-family: Arial, sans-serif;
 }
 
 table {
