@@ -1,9 +1,11 @@
 module Calculator exposing (..)
 
 import Browser
+import Browser.Events exposing (onKeyPress)
 import Html exposing (Html, div, table, tbody, td, text, th, thead, tr)
 import Html.Attributes exposing (class, colspan, style)
 import Html.Events exposing (onClick)
+import Json.Decode as Decode
 import Svg exposing (svg, use)
 import Svg.Attributes exposing (xlinkHref)
 
@@ -27,6 +29,12 @@ type Msg
     | ClickEquals
     | ZoomIn
     | ZoomOut
+    | CharacterKey Char
+    | ControlKey String
+
+
+
+-- MODEL
 
 
 type alias Model =
@@ -46,7 +54,12 @@ initialModel =
     }
 
 
-update : Msg -> Model -> Model
+init : () -> ( Model, Cmd Msg )
+init _ =
+    ( initialModel, Cmd.none )
+
+
+update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         ClickDigit digit ->
@@ -63,10 +76,10 @@ update msg model =
                             Just op2 ->
                                 { model | operand2 = Just (op2 * 10 + toFloat digit) }
             in
-            newModel
+            ( newModel, Cmd.none )
 
         ClickAction Clear ->
-            initialModel
+            ( initialModel, Cmd.none )
 
         ClickAction Delete ->
             let
@@ -76,10 +89,10 @@ update msg model =
                         |> floor
                         |> toFloat
             in
-            { model | operand1 = newOperand1 }
+            ( { model | operand1 = newOperand1 }, Cmd.none )
 
         ClickOperator op ->
-            { model | operator = Just op }
+            ( { model | operator = Just op }, Cmd.none )
 
         ClickEquals ->
             let
@@ -109,16 +122,62 @@ update msg model =
             in
             case result of
                 Just res ->
-                    { initialModel | operand1 = res }
+                    ( { initialModel | operand1 = res }, Cmd.none )
 
                 Nothing ->
-                    model
+                    ( model, Cmd.none )
 
         ZoomIn ->
-            { model | zoomFactor = model.zoomFactor + 0.1 }
+            ( { model | zoomFactor = model.zoomFactor + 0.1 }, Cmd.none )
 
         ZoomOut ->
-            { model | zoomFactor = model.zoomFactor - 0.1 }
+            ( { model | zoomFactor = model.zoomFactor - 0.1 }, Cmd.none )
+
+        CharacterKey char ->
+            if Char.isDigit char then
+                let
+                    digitNumber =
+                        char
+                            |> String.fromChar
+                            |> String.toInt
+                            |> Maybe.withDefault 0
+                in
+                update (ClickDigit digitNumber) model
+
+            else
+                case char of
+                    '+' ->
+                        update (ClickOperator Plus) model
+
+                    '-' ->
+                        update (ClickOperator Minus) model
+
+                    '*' ->
+                        update (ClickOperator Multiply) model
+
+                    '/' ->
+                        update (ClickOperator Divide) model
+
+                    'c' ->
+                        update (ClickAction Clear) model
+
+                    'C' ->
+                        update (ClickAction Clear) model
+
+                    _ ->
+                        ( model, Cmd.none )
+
+        ControlKey string ->
+            let
+                _ =
+                    Debug.log "ControlKey" string
+            in
+            case string of
+                "Enter" ->
+                    update ClickEquals model
+
+                _ ->
+                    ( model, Cmd.none )
 
 
 operatorDivide =
@@ -237,9 +296,42 @@ view model =
         ]
 
 
+
+-- SUBSCRIPTIONS
+
+
+subscriptions : Model -> Sub Msg
+subscriptions model =
+    onKeyPress keyDecoder
+
+
+keyDecoder : Decode.Decoder Msg
+keyDecoder =
+    Decode.map toKey (Decode.field "key" Decode.string)
+
+
+toKey : String -> Msg
+toKey keyValue =
+    case String.uncons keyValue of
+        Just ( char, "" ) ->
+            let
+                _ =
+                    Debug.log "char" char
+            in
+            CharacterKey char
+
+        _ ->
+            let
+                _ =
+                    Debug.log "keyValue" keyValue
+            in
+            ControlKey keyValue
+
+
 main =
-    Browser.sandbox
-        { init = initialModel
+    Browser.element
+        { init = init
         , update = update
         , view = view
+        , subscriptions = subscriptions
         }
