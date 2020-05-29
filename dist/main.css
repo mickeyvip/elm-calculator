@@ -3,6 +3,11 @@ body {
     font-weight: 100;
 }
 
+svg,
+img {
+    fill: currentColor;
+}
+
 .calculator {
     background-color: #505050;
     display: inline-block;
@@ -25,6 +30,11 @@ table td {
     text-align: center;
     cursor: pointer;
     transition-duration: 0.9s;
+}
+
+table td svg {
+    width: 30px;
+    height: 30px;
 }
 
 table td.operator {
