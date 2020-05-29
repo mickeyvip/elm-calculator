@@ -1,0 +1,46 @@
+.calculator {
+    background-color: #505050;
+    display: inline-block;
+    font-size: 18px;
+    font-family: Arial, sans-serif;
+}
+
+table {
+    border: 1px solid gray;
+    color: white;
+    font-weight: 100;
+    box-shadow: 10px 10px #0000;
+}
+
+table td {
+    border: 1px solid gray;
+    padding: 5px;
+    width: 35px;
+    height: 25px;
+    background-color: #202020;
+    text-align: center;
+    cursor: pointer;
+    transition-duration: 0.9s;
+}
+
+table td.operator {
+    color: lightblue;
+    font-size: 25px;
+}
+
+table td.delete {
+    color: #E9AAAA;
+}
+
+table td:hover {
+    background-color: #505050;
+    transition-duration: 0.3s;
+}
+
+table th.display {
+    padding: 3px 5px;
+    font-size: 30px;
+    background-color: #363955;
+    border: 1px solid #868DD5;
+    text-align: right;
+}

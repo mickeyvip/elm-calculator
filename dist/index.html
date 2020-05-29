@@ -1,0 +1,20 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Calculator</title>
+  <link rel="stylesheet" href="main.css">
+</head>
+
+<body>
+
+<pre id="elm"></pre>
+
+<script src="index.js"></script>
+<script>
+  const calculatorApp = Elm.Calculator.init({
+    node: document.getElementById("elm")
+  });
+</script>
+</body>
+</html>
